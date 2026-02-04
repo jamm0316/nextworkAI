@@ -1,25 +1,20 @@
 import { DailyLogCard } from "@/components/DailyLogCard";
 import { LogInput } from "@/components/LogInput";
 import { Sparkles } from "lucide-react";
+import { getWorkLogs } from "@/lib/api";
 
-export default function Home() {
-  // Mock Data
-  const logs = [
-    {
-      id: 1,
-      date: "2024-05-20",
-      todayWork: "• Refactored Authenticator service to support OAuth2.\n• Fixed a critical bug in the Payment Gateway integration.\n• Reviewed PRs for the new dashboard UI.",
-      retrospective: "Felt productive in the morning but got distracted by ad-hoc meetings in the afternoon. Need to block focus time.",
-      tomorrowAction: "• Complete Unit Tests for Authenticator.\n• Sync with Frontend team on API contract."
-    },
-    {
-      id: 2,
-      date: "2024-05-19",
-      todayWork: "• Investigated memory leak in the production server.\n• Optimized database queries for the Analytics service.",
-      retrospective: "Solving the leak was satisfying, but it took longer than expected. Should have used the profiler sooner.",
-      tomorrowAction: "• Document the optimization findings.\n• Start on the OAuth2 refactor."
-    }
-  ];
+// This is a Server Component
+export default async function Home() {
+  let logs: any[] = [];
+  try {
+    logs = await getWorkLogs();
+  } catch (e) {
+    console.error("Failed to fetch logs:", e);
+    // Fallback to empty or error state if needed
+  }
+
+  // Sort logs by ID desc or Date desc
+  logs.sort((a, b) => b.id - a.id);
 
   return (
     <main className="min-h-screen bg-[#09090b] text-white">
@@ -49,9 +44,15 @@ export default function Home() {
             </div>
 
             <div className="space-y-6">
-              {logs.map((log) => (
-                <DailyLogCard key={log.id} log={log} />
-              ))}
+              {logs.length > 0 ? (
+                logs.map((log) => (
+                  <DailyLogCard key={log.id} log={log} />
+                ))
+              ) : (
+                <div className="rounded-2xl border border-white/5 bg-zinc-900/30 p-8 text-center text-zinc-500">
+                  No work logs generated yet. Submit some logs and generate a daily report!
+                </div>
+              )}
             </div>
           </div>
 

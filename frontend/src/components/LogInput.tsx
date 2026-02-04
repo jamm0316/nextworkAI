@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Send, Sparkles } from "lucide-react";
+import { ingestLog } from "@/lib/api";
 
 export function LogInput() {
     const [input, setInput] = useState("");
@@ -12,13 +13,12 @@ export function LogInput() {
         setIsSubmitting(true);
 
         try {
-            // API call placeholder
-            console.log("Submitting log:", input);
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Fake delay
+            await ingestLog(input);
             setInput("");
-            alert("Log submitted! AI is processing...");
+            alert("Log submitted successfully! The AI agent will process it shortly.");
         } catch (e) {
             console.error(e);
+            alert("Failed to submit log. Please check if the backend is running.");
         } finally {
             setIsSubmitting(false);
         }
